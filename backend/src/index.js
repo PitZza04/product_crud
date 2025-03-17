@@ -2,12 +2,14 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
-
+import dotenv from "dotenv";
 import productRoutes from "./routes/products/index.js";
+import { pool } from "./config/db.js";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
-
+const port = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(cors());
@@ -25,30 +27,30 @@ app.get("/", (req, res) => {
 
 app.use("/products", productRoutes);
 
-app.listen(port, () => {
-  console.log(`Listening on port: ${port}`);
-});
-
-// async function initDB() {
-//   try {
-//     const sql = `
-//     CREATE TABLE IF NOT EXISTS products (
-//         id INT AUTO_INCREMENT PRIMARY KEY,
-//         name VARCHAR(255) NOT NULL,
-//         price DECIMAL(10,2) NOT NULL,
-//         stock INT NOT NULL DEFAULT 0,
-//         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-//     );`;
-//     const [result] = await pool.query(sql);
-
-//     console.log("Initializing database: ", result);
-//   } catch (error) {
-//     console.log("Error initDB", error);
-//   }
-// }
-
-// initDB().then(() => {
-//   app.listen(port, () => {
-//     console.log(`Listening on port: ${port}`);
-//   });
+// app.listen(port, () => {
+//   console.log(`Listening on port: ${port}`);
 // });
+
+async function initDB() {
+  try {
+    const sql = `
+    CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        stock INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`;
+    const [result] = await pool.query(sql);
+
+    console.log("Initializing database: ", result);
+  } catch (error) {
+    console.log("Error initDB", error);
+  }
+}
+
+initDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Listening on port: ${port}`);
+  });
+});

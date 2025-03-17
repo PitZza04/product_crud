@@ -29,6 +29,7 @@ export async function getProductById(req, res) {
 
 export async function createProduct(req, res) {
   try {
+    console.log("Request", req.body);
     const { name, price, stock } = req.body;
 
     const [newProduct] = await pool.query(
